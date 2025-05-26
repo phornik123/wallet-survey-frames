@@ -121,6 +121,18 @@ export default function HomePage() {
           </p>
         </div>
 
+        <div className="mt-8">
+          <a 
+            href="/showcase" 
+            className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:opacity-90 transition-opacity"
+          >
+            🎯 View Professional Showcase
+          </a>
+          <p className="text-gray-400 mt-3 text-sm">
+            See comprehensive demos and marketing materials
+          </p>
+        </div>
+
         <div className="mt-8 text-gray-400 text-sm">
           <p>
             Built with Next.js, TypeScript, and Farcaster Frames v2

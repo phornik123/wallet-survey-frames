@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import ShowcaseNav from './components/ShowcaseNav';
 
 export const metadata: Metadata = {
   title: 'Wallet Survey Frames',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ShowcaseNav />
+        {children}
+      </body>
     </html>
   );
 }

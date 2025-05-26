@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Survey, Question, SurveyResponse } from '@/types';
 import { WalletProfile } from '@/components/WalletProfile';
+import { selectSurveyForSegment } from '@/lib/survey-targeting';
 
 interface EmbedPageProps {}
 
@@ -21,6 +22,8 @@ export default function EmbedPage({}: EmbedPageProps) {
   const [isCompleted, setIsCompleted] = useState(false);
   const [hasResponded, setHasResponded] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [behavioralProfile, setBehavioralProfile] = useState<any>(null);
+  const [rewardInfo, setRewardInfo] = useState<any>(null);
 
   // Load survey from API
   useEffect(() => {
@@ -136,23 +139,68 @@ export default function EmbedPage({}: EmbedPageProps) {
     }
   };
 
-  // Check if user has already responded
+  // NEW: Handle wallet connected with behavioral analysis
   const checkExistingResponse = async (address: string) => {
     try {
-      const response = await fetch(`/api/embed/check-response?surveyId=${surveyId}&walletAddress=${address}`);
-      if (response.ok) {
-        const data = await response.json();
+      // 1. Get behavioral analysis
+      const behavioralResponse = await fetch('/api/behavioral-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress: address })
+      });
+      
+      const behavioralProfile = await behavioralResponse.json();
+      setBehavioralProfile(behavioralProfile);
+      
+      // 2. Get targeted survey based on eligibility
+      // FIXED: No more blocking - everyone can take surveys!
+      const targetedSurveyId = behavioralProfile.isEligible 
+        ? selectSurveyForSegment(behavioralProfile.segment)
+        : 'demo'; // Default survey for ineligible users
+      
+      // 4. Check if already responded to the targeted survey
+      const responseCheck = await fetch(`/api/embed/check-response?surveyId=${targetedSurveyId}&walletAddress=${address}`);
+      if (responseCheck.ok) {
+        const data = await responseCheck.json();
         if (data.hasResponded) {
           setHasResponded(true);
-        } else {
-          // User hasn't responded, show profile first
+          return;
+        }
+      }
+      
+      // 5. Load the targeted survey (instead of current survey)
+      const surveys = await fetch('/api/surveys').then(r => r.json());
+      const targetedSurvey = surveys.find((s: Survey) => s.id === targetedSurveyId);
+      
+      if (targetedSurvey) {
+        setSurvey(targetedSurvey);
+        setShowProfile(true); // Show profile first
+      } else {
+        // Fallback to original survey
+        const fallbackSurvey = surveys.find((s: Survey) => s.id === surveyId);
+        if (fallbackSurvey) {
+          setSurvey(fallbackSurvey);
           setShowProfile(true);
         }
       }
-    } catch (err) {
-      console.error('Error checking existing response:', err);
-      // On error, still show profile
-      setShowProfile(true);
+      
+    } catch (error) {
+      console.error('Behavioral analysis error:', error);
+      // Fallback to original survey flow
+      try {
+        const response = await fetch(`/api/embed/check-response?surveyId=${surveyId}&walletAddress=${address}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.hasResponded) {
+            setHasResponded(true);
+          } else {
+            setShowProfile(true);
+          }
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback error:', fallbackErr);
+        setShowProfile(true);
+      }
     }
   };
 
@@ -195,12 +243,13 @@ export default function EmbedPage({}: EmbedPageProps) {
     }
   };
 
-  // Submit survey
+  // Submit survey with reward distribution
   const submitSurvey = async () => {
     if (!survey || !walletAddress) return;
 
     setIsSubmitting(true);
     try {
+      // 1. Save survey response (existing logic)
       const surveyResponse: SurveyResponse = {
         surveyId: survey.id,
         walletAddress,
@@ -220,6 +269,23 @@ export default function EmbedPage({}: EmbedPageProps) {
         throw new Error('Failed to submit survey');
       }
 
+      // 2. NEW: Distribute USDC reward
+      const rewardAmount = getRewardAmount(survey.id, behavioralProfile?.segment);
+      
+      const rewardResponse = await fetch('/api/rewards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress,
+          surveyId: survey.id,
+          amount: rewardAmount
+        })
+      });
+      
+      const rewardResult = await rewardResponse.json();
+      setRewardInfo(rewardResult);
+
+      // 3. Show completion with reward info
       setIsCompleted(true);
       sendMessage('survey_completed', surveyResponse);
     } catch (err: any) {
@@ -228,6 +294,21 @@ export default function EmbedPage({}: EmbedPageProps) {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Helper function to determine reward amount
+  const getRewardAmount = (surveyId: string, segment?: string): number => {
+    // Define reward amounts per survey/segment
+    const rewardRules: Record<string, number> = {
+      'yield-optimizer-advanced': 5, // $5 USDC for advanced surveys
+      'yield-curious-onboarding': 3, // $3 USDC for onboarding
+      'memecoin-sentiment': 2,       // $2 USDC for quick surveys
+      'conservative-yield': 3,       // $3 USDC for conservative surveys
+      'nft-utility': 2,              // $2 USDC for NFT surveys
+      'demo': 1                      // $1 USDC for demo
+    };
+    
+    return rewardRules[surveyId] || 1;
   };
 
   // Render question based on type
@@ -327,10 +408,32 @@ export default function EmbedPage({}: EmbedPageProps) {
   if (isCompleted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="text-center">
+        <div className="text-center space-y-4">
           <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Thank You!</h2>
-          <p className="text-gray-600">Your response has been recorded.</p>
+          <h2 className="text-2xl font-bold text-green-600">Survey Completed!</h2>
+          <p className="text-gray-600">Thank you for your participation.</p>
+          
+          {/* FIXED: Honest Reward Display */}
+          {rewardInfo && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+              {rewardInfo.success ? (
+                <>
+                  <h3 className="font-semibold text-blue-800">Reward Logged! 📝</h3>
+                  <p className="text-blue-700">${rewardInfo.amount} USDC equivalent logged for your wallet</p>
+                  <p className="text-xs text-blue-600 mt-2">Status: Pending manual distribution</p>
+                  <p className="text-xs text-blue-600">Reward wallet: 0x1C18...12ed</p>
+                </>
+              ) : (
+                <>
+                  <h3 className="font-semibold text-orange-800">Reward Error</h3>
+                  <p className="text-orange-700">Unable to log reward</p>
+                  {rewardInfo.error && (
+                    <p className="text-xs text-orange-600 mt-2">Error: {rewardInfo.error}</p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );
