@@ -1,0 +1,34 @@
+[
+  {
+    "id": "demo",
+    "title": "Demo Feedback Survey",
+    "questions": [
+      {
+        "id": "satisfaction",
+        "type": "multiple-choice",
+        "question": "How satisfied are you with our service?",
+        "options": [
+          "Very Satisfied",
+          "Satisfied",
+          "Neutral",
+          "Dissatisfied"
+        ],
+        "required": true
+      },
+      {
+        "id": "rating",
+        "type": "rating",
+        "question": "Rate us from 1-5 stars",
+        "required": true
+      },
+      {
+        "id": "feedback",
+        "type": "text",
+        "question": "Any additional feedback?",
+        "required": false
+      }
+    ],
+    "createdAt": "2025-05-24T18:10:23.917Z",
+    "isActive": true
+  }
+]

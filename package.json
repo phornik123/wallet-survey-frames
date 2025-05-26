@@ -1,0 +1,52 @@
+{
+  "name": "wallet-survey-frames",
+  "version": "1.0.0",
+  "description": "A comprehensive wallet-connected survey platform with Farcaster Frames and embeddable JavaScript SDK integration",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "farcaster",
+    "frames",
+    "wallet",
+    "survey",
+    "web3",
+    "nextjs",
+    "typescript",
+    "metamask",
+    "blockchain",
+    "dapp",
+    "sdk",
+    "embeddable"
+  ],
+  "author": "phornik123",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phornik123/wallet-survey-frames.git"
+  },
+  "homepage": "https://github.com/phornik123/wallet-survey-frames#readme",
+  "bugs": {
+    "url": "https://github.com/phornik123/wallet-survey-frames/issues"
+  },
+  "dependencies": {
+    "@types/node": "^22.15.21",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "next": "^14.2.29",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.8.3",
+    "viem": "^2.30.1",
+    "satori": "^0.10.9",
+    "sharp": "^0.33.0",
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
+  }
+}
