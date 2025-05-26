@@ -30,5 +30,118 @@
     ],
     "createdAt": "2025-05-24T18:10:23.917Z",
     "isActive": true
+  },
+  {
+    "id": "yield-optimizer-advanced",
+    "title": "Advanced Yield Optimization Survey",
+    "questions": [
+      {
+        "id": "current-yield-strategy",
+        "type": "multiple-choice",
+        "question": "What's your primary yield optimization strategy?",
+        "options": ["Single protocol focus", "Multi-protocol diversification", "Automated yield farming", "Manual position management"],
+        "required": true
+      },
+      {
+        "id": "yield-satisfaction",
+        "type": "rating",
+        "question": "How satisfied are you with your current yields?",
+        "required": true
+      },
+      {
+        "id": "new-protocols",
+        "type": "text",
+        "question": "What new yield protocols are you most interested in?",
+        "required": false
+      }
+    ],
+    "createdAt": "2025-01-01T00:00:00Z",
+    "isActive": true
+  },
+  {
+    "id": "yield-curious-onboarding",
+    "title": "DeFi Yield Exploration Survey",
+    "questions": [
+      {
+        "id": "yield-hesitation",
+        "type": "multiple-choice",
+        "question": "What's stopping you from earning yield on your crypto?",
+        "options": ["Don't understand the risks", "Don't know where to start", "Worried about smart contract risk", "Gas fees too high"],
+        "required": true
+      },
+      {
+        "id": "preferred-risk",
+        "type": "multiple-choice",
+        "question": "What's your preferred risk level?",
+        "options": ["Very safe (2-4% APY)", "Moderate (5-8% APY)", "Higher yield (10%+ APY)"],
+        "required": true
+      }
+    ],
+    "createdAt": "2025-01-01T00:00:00Z",
+    "isActive": true
+  },
+  {
+    "id": "memecoin-sentiment",
+    "title": "Memecoin Sentiment Survey",
+    "questions": [
+      {
+        "id": "memecoin-strategy",
+        "type": "multiple-choice",
+        "question": "What's your memecoin investment approach?",
+        "options": ["HODL long-term", "Quick trades", "DCA strategy", "Just for fun"],
+        "required": true
+      },
+      {
+        "id": "next-memecoin",
+        "type": "text",
+        "question": "What memecoin trends are you watching?",
+        "required": false
+      }
+    ],
+    "createdAt": "2025-01-01T00:00:00Z",
+    "isActive": true
+  },
+  {
+    "id": "conservative-yield",
+    "title": "Conservative DeFi Strategy Survey",
+    "questions": [
+      {
+        "id": "risk-tolerance",
+        "type": "multiple-choice",
+        "question": "What's most important in your DeFi strategy?",
+        "options": ["Capital preservation", "Steady returns", "Protocol security", "Regulatory compliance"],
+        "required": true
+      },
+      {
+        "id": "protocol-preference",
+        "type": "multiple-choice",
+        "question": "Which protocols do you trust most?",
+        "options": ["Aave", "Compound", "MakerDAO", "Uniswap"],
+        "required": true
+      }
+    ],
+    "createdAt": "2025-01-01T00:00:00Z",
+    "isActive": true
+  },
+  {
+    "id": "nft-utility",
+    "title": "NFT Utility & Value Survey",
+    "questions": [
+      {
+        "id": "nft-purpose",
+        "type": "multiple-choice",
+        "question": "What do you value most in NFTs?",
+        "options": ["Art and aesthetics", "Utility and functionality", "Community access", "Investment potential"],
+        "required": true
+      },
+      {
+        "id": "nft-future",
+        "type": "text",
+        "question": "What NFT use cases excite you most?",
+        "required": false
+      }
+    ],
+    "createdAt": "2025-01-01T00:00:00Z",
+    "isActive": true
   }
 ]

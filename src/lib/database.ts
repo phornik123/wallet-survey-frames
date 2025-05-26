@@ -2,9 +2,19 @@ import fs from 'fs/promises';
 import path from 'path';
 import { Survey, SurveyResponse } from '@/types';
 
+export interface RewardRecord {
+  surveyId: string;
+  walletAddress: string;
+  amount: number;
+  transactionHash: string;
+  timestamp: string;
+  status: 'completed' | 'pending' | 'failed';
+}
+
 const DATA_DIR = path.join(process.cwd(), 'data');
 const SURVEYS_FILE = path.join(DATA_DIR, 'surveys.json');
 const RESPONSES_FILE = path.join(DATA_DIR, 'responses.json');
+const REWARDS_FILE = path.join(DATA_DIR, 'rewards.json');
 
 // Ensure data directory exists
 async function ensureDataDir() {
@@ -138,5 +148,30 @@ export class Database {
       responsesByOption,
       completionRate: totalResponses > 0 ? 100 : 0 // For MVP, assume all responses are complete
     };
+  }
+
+  // Reward operations
+  static async getRewards(): Promise<RewardRecord[]> {
+    try {
+      await ensureDataDir();
+      const data = await fs.readFile(REWARDS_FILE, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      // If file doesn't exist, return empty array
+      return [];
+    }
+  }
+
+  static async getReward(surveyId: string, walletAddress: string): Promise<RewardRecord | null> {
+    const rewards = await this.getRewards();
+    return rewards.find(r => r.surveyId === surveyId && r.walletAddress.toLowerCase() === walletAddress.toLowerCase()) || null;
+  }
+
+  static async saveReward(reward: RewardRecord): Promise<void> {
+    const rewards = await this.getRewards();
+    rewards.push(reward);
+    
+    await ensureDataDir();
+    await fs.writeFile(REWARDS_FILE, JSON.stringify(rewards, null, 2));
   }
 }

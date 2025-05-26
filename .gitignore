@@ -55,8 +55,9 @@ pids
 *.seed
 *.pid.lock
 
-# User data (contains sensitive survey responses)
+# User data (contains sensitive survey responses and reward records)
 data/responses.json
+data/rewards.json
 
 # Temporary files
 *.tmp
